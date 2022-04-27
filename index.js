@@ -117,24 +117,46 @@ class Remp {
     return this.request('POST', path, params, headers)
   }
 
+  /**
+   * Checks if the last request contained an access token
+   * @returns {boolean} true if the last request contained an access token
+   */
   hasNewToken () { return this.userToken != null }
 
+  /**
+   * Creates a new instance based on the current instance settings with the last responded access token
+   * @returns {Remp} a new instance with the last responded access token
+   */
   createTokenInstance () { return new Remp(this.server, this.userToken, this.verbose) }
 }
 
+/**
+ * Error class for errors during execution
+ *
+ * massage is 'http-failure' in case of an http response not equal 200, or 'remp-failure' in case of an error response by the remp server
+ */
 class RempError extends Error {
+  /**
+    * @param {string} message error message, 'http-failure' or 'remp-failure'
+    * @param {*} data error specific data
+    */
   constructor (message, data) {
     super(message)
     this.data = data
   }
 
+  /**
+   * @returns {*} error specific data
+   */
   getData () { return this.data }
 }
 
 const RempUser = require('./lib/User')
+const RempUsers = require('./lib/Users')
 
 module.exports = {
   Remp,
   RempError,
-  RempUser
+  RempUser,
+  RempUsers
 }
