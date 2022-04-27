@@ -1,0 +1,24 @@
+{
+    "name": "remp-node-api",
+    "version": "0.1.0",
+    "description": "Thin wrapper around the REMP server API for Node.js.",
+    "main": "index.js",
+    "author": "Alexander Merz",
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/alexmerz/remp-node-api",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/alexmerz/remp-node-api"
+    },
+    "scripts": {
+        "lint": "eslint --ext .js .",
+        "lintfix": "eslint --fix --ext .js ."
+    },
+    "devDependencies": {
+        "eslint": "^8.14.0",
+        "eslint-config-standard": "^17.0.0",
+        "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-n": "^15.2.0",
+        "eslint-plugin-promise": "^6.0.0"
+    }
+}
