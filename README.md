@@ -15,7 +15,7 @@ const {Remp} = require('remp-node-api')
 
 const token = '...';
 const server = 'https://crm.press/';
-const remp = new Remp(token, server);
+const remp = new Remp(server, token);
 
 const params = {
     Email: 'example@example.com'
@@ -33,7 +33,7 @@ const {Remp, RempUser, RempUsers} = require('remp-node-api')
 
 const token = '...';
 const server = 'https://crm.press/';
-const remp = new Remp(token, server);
+const remp = new Remp(server, token);
 const rempusers = new RempUsers(remp);
 let myuser = null;
 
