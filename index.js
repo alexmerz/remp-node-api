@@ -1,4 +1,5 @@
 const https = require('https')
+const querystring = require('node:querystring')
 
 /**
  * Main instance class for REMP API access
@@ -19,7 +20,7 @@ class Remp {
     this.token = token
     this.headers = {
       Authorization: 'Bearer ' + this.token,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }
     this.verbose = verbose
     this.userToken = null
@@ -40,7 +41,7 @@ class Remp {
   async request (method, path, params = '', optheaders = []) {
     const url = this.server + path
     const headers = Object.assign({}, this.headers, optheaders)
-    const body = (typeof params !== 'string') ? JSON.stringify(params) : params
+    const body = (typeof params !== 'string') ? querystring.stringify(params) : params
 
     if (this.verbose) {
       console.log(`${method} ${url}`)
