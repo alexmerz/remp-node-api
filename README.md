@@ -13,9 +13,14 @@ In general you, set up a *Remp* instance with your server URL and the API bearer
 ```js
 const {Remp} = require('remp-node-api')
 
-const token = '...';
-const server = 'https://crm.press/';
-const remp = new Remp(server, token);
+const options = {
+    server: 'https://crm.press/',
+    token: '...',
+    referer: 'https://example.com/',
+    verbose: true // show debug messages on console
+}
+
+const remp = new Remp(options);
 
 const params = {
     Email: 'example@example.com'
@@ -31,9 +36,13 @@ If a API call returns an access token in its response, you can easily create a n
 ```js
 const {Remp, RempUser, RempUsers} = require('remp-node-api')
 
-const token = '...';
-const server = 'https://crm.press/';
-const remp = new Remp(server, token);
+const options = {
+    server: 'https://crm.press/',
+    token: '...',
+    referer: 'https://example.com/'
+}
+
+const remp = new Remp(options);
 const rempusers = new RempUsers(remp);
 let myuser = null;
 
