@@ -10,39 +10,39 @@ const querystring = require('node:querystring')
 class Remp {
   /**
      * Creates the instance
-     * 
+     *
      * Options:
      * - options.server: the server to connect to
      * - options.token: the token to use
      * - options.verbose: if true, the request will be printed to the console
      * - options.referer: the referer header to set to avoid server to server circles
-     * 
+     *
      * @constructor
      * @param {Object|string} server the server to connect to, for example: https://crm.press
      * @param {string} token the token to use for authentication
      * @param {boolean} verbose whether to print debug information
      */
   constructor (options, token = null, verbose = false) {
-    if (typeof options === 'string') { // support old style
-      this.server = server
+    if (typeof options === 'string') { // support old style, server = options
+      this.server = options
       this.token = token
       this.verbose = verbose
     } else {
-      if(!options.server || !options.token) {
-        throw new Error('Server and token must be set');
+      if (!options.server || !options.token) {
+        throw new Error('Server and token must be set')
       }
-      this.server = options.server;
-      this.token = options.token;
-      this.verbose = options.verbose || false;
-      this.referer = options.referer || null;
+      this.server = options.server
+      this.token = options.token
+      this.verbose = options.verbose || false
+      this.referer = options.referer || null
     }
     this.headers = {
       Authorization: 'Bearer ' + this.token,
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }
 
-    if(this.referer !== null) {
-      this.headers['Referer'] = this.referer;
+    if (this.referer !== null) {
+      this.headers.Referer = this.referer
     }
     this.userToken = null
     this.lastError = null
@@ -149,14 +149,14 @@ class Remp {
    * Creates a new instance based on the current instance settings with the last responded access token
    * @returns {Remp} a new instance with the last responded access token
    */
-  createTokenInstance () { 
+  createTokenInstance () {
     const options = {
       server: this.server,
       token: this.userToken,
       verbose: this.verbose,
       referer: this.referer
-    };
-    return new Remp(options) 
+    }
+    return new Remp(options)
   }
 }
 
