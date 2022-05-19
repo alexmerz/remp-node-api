@@ -184,10 +184,12 @@ class RempError extends Error {
 const RempUser = require('./lib/User')
 const RempUsers = require('./lib/Users')
 const RempSubscriptions = require('./lib/Subscriptions');
+const RempRecurrentPayment = require('./lib/RecurrentPayment');
 module.exports = {
   Remp,
   RempError,
   RempUser,
   RempUsers,
-  RempSubscriptions
+  RempSubscriptions,
+  RempRecurrentPayment
 }
