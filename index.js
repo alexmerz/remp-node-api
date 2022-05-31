@@ -64,16 +64,16 @@ class Remp {
     const headers = Object.assign({}, this.headers, optheaders)
     const body = (typeof params !== 'string') ? querystring.stringify(params) : params
 
+    if(method == 'GET') {
+      url += '?' + body
+      body = '';
+    }
+
     if (this.verbose) {
       console.log(`${method} ${url}`)
       console.log(headers)
       console.log(body)
     };
-
-    if(method == 'GET') {
-      url += '?' + body
-      body = '';
-    }
 
     return new Promise((resolve, reject) => {
       const req = https.request(
