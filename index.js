@@ -60,7 +60,7 @@ class Remp {
      * @param {Array} optheaders additional headers to send
      */
   async request (method, path, params = '', optheaders = []) {
-    const url = this.server + path
+    let url = this.server + path
     const headers = Object.assign({}, this.headers, optheaders)
     const body = (typeof params !== 'string') ? querystring.stringify(params) : params
 
