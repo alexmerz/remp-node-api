@@ -70,6 +70,11 @@ class Remp {
       console.log(body)
     };
 
+    if(method == 'GET') {
+      url += '?' + body
+      body = '';
+    }
+
     return new Promise((resolve, reject) => {
       const req = https.request(
         url,
@@ -183,8 +188,8 @@ class RempError extends Error {
 
 const RempUser = require('./lib/User')
 const RempUsers = require('./lib/Users')
-const RempSubscriptions = require('./lib/Subscriptions');
-const RempRecurrentPayment = require('./lib/RecurrentPayment');
+const RempSubscriptions = require('./lib/Subscriptions')
+const RempRecurrentPayment = require('./lib/RecurrentPayment')
 module.exports = {
   Remp,
   RempError,
