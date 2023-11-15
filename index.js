@@ -41,6 +41,10 @@ class Remp {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }
 
+    if (('object' === typeof options) && (options.customHeaders)) {
+      this.headers = { ...this.headers, ...options.customHeaders };
+    }
+
     if (this.referer !== null) {
       this.headers.Referer = this.referer
     }
