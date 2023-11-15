@@ -17,7 +17,11 @@ const options = {
     server: 'https://crm.press/',
     token: '...',
     referer: 'https://example.com/',
-    verbose: true // show debug messages on console
+    verbose: true, // show debug messages on console
+    customHeaders: { // optional
+        // set custom headers or overwrite defaults
+        'Content-Type': 'application/json'
+    }
 }
 
 const remp = new Remp(options);
