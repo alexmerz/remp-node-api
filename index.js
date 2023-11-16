@@ -66,10 +66,21 @@ class Remp {
   async request (method, path, params = '', optheaders = []) {
     let url = this.server + path
     const headers = Object.assign({}, this.headers, optheaders)
-    let body = (typeof params !== 'string') ? querystring.stringify(params) : params
+    let body = params;
+
+    if (!String.prototype.startsWith) {
+      String.prototype.startsWith = function(search, pos) {
+        pos = !pos || pos < 0 ? 0 : +pos;
+        return this.substring(pos, pos + search.length) === search;
+      };
+    }
+
+    if ((typeof params !== 'string') && (headers['Content-Type'].startsWith('application/x-www-form-urlencoded'))) {
+      body = querystring.stringify(params);
+    }
 
     if(method == 'GET') {
-      url += '?' + body
+      url += '?' + querystring.stringify(params)
       body = '';
     }
 
@@ -77,7 +88,7 @@ class Remp {
       console.log(`${method} ${url}`)
       console.log(headers)
       console.log(body)
-    };
+    }
 
     return new Promise((resolve, reject) => {
       const req = https.request(
@@ -98,7 +109,7 @@ class Remp {
           response.on('end', () => {
             if (this.verbose) {
               console.log(data)
-            };
+            }
             const result = JSON.parse(data)
 
             // we check the result for an access token, if it is there, we store the token for potential later use
