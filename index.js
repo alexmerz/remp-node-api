@@ -66,7 +66,7 @@ class Remp {
   async request(method, path, params = '', optheaders = []) {
     let url = this.server + path
     const headers = Object.assign({}, this.headers, optheaders)
-    let query = '';
+    let query = params;
     let body = params;
 
     if (typeof params !== 'string') {
