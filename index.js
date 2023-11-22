@@ -9,20 +9,20 @@ const querystring = require('node:querystring')
  */
 class Remp {
   /**
-     * Creates the instance
-     *
-     * Options:
-     * - options.server: the server to connect to
-     * - options.token: the token to use
-     * - options.verbose: if true, the request will be printed to the console
-     * - options.referer: the referer header to set to avoid server to server circles
-     *
-     * @constructor
-     * @param {Object|string} server the server to connect to, for example: https://crm.press
-     * @param {string} token the token to use for authentication
-     * @param {boolean} verbose whether to print debug information
-     */
-  constructor (options, token = null, verbose = false) {
+   * Creates the instance
+   *
+   * Options:
+   * - options.server: the server to connect to
+   * - options.token: the token to use
+   * - options.verbose: if true, the request will be printed to the console
+   * - options.referer: the referer header to set to avoid server to server circles
+   *
+   * @constructor
+   * @param {Object|string} server the server to connect to, for example: https://crm.press
+   * @param {string} token the token to use for authentication
+   * @param {boolean} verbose whether to print debug information
+   */
+  constructor(options, token = null, verbose = false) {
     if (typeof options === 'string') { // support old style, server = options
       this.server = options
       this.token = token
@@ -53,35 +53,45 @@ class Remp {
   }
 
   /**
-     * Sends the actual request
-     *
-     * If the request was successful and the responce contained an new response->access->token, you can
-     * use createTokenInstance() to create a new instance with the new token.
-     *
-     * @param {string} method the http method to use
-     * @param {string} path the path to the endpoint
-     * @param {Array|string} params the parameters to send as JSON or object
-     * @param {Array} optheaders additional headers to send
-     */
-  async request (method, path, params = '', optheaders = []) {
+   * Sends the actual request
+   *
+   * If the request was successful and the responce contained an new response->access->token, you can
+   * use createTokenInstance() to create a new instance with the new token.
+   *
+   * @param {string} method the http method to use
+   * @param {string} path the path to the endpoint
+   * @param {Array|string} params the parameters to send as JSON or object
+   * @param {Array} optheaders additional headers to send
+   */
+  async request(method, path, params = '', optheaders = []) {
     let url = this.server + path
     const headers = Object.assign({}, this.headers, optheaders)
+    let query = '';
     let body = params;
 
-    if (!String.prototype.startsWith) {
-      String.prototype.startsWith = function(search, pos) {
-        pos = !pos || pos < 0 ? 0 : +pos;
-        return this.substring(pos, pos + search.length) === search;
-      };
+    if (typeof params !== 'string') {
+
+      query += querystring.stringify(params)
+
+      // polyfill
+      if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (search, pos) {
+          pos = !pos || pos < 0 ? 0 : +pos;
+          return this.substring(pos, pos + search.length) === search;
+        };
+      }
+
+      if (headers['Content-Type'].startsWith('application/x-www-form-urlencoded')) {
+        body = query;
+      }
+
+      if (headers['Content-Type'].startsWith('application/json')) {
+        body = JSON.stringify(params);
+      }
     }
 
-    if ((typeof params !== 'string') && (headers['Content-Type'].startsWith('application/x-www-form-urlencoded'))) {
-      body = querystring.stringify(params);
-    }
-
-    if(method == 'GET') {
-      url += '?' + querystring.stringify(params)
-      body = '';
+    if ('GET' === method) {
+      url += '?' + query;
     }
 
     if (this.verbose) {
@@ -94,22 +104,29 @@ class Remp {
       const req = https.request(
         url,
         {
-          method,
-          headers
+          method: method,
+          headers: headers,
         },
         (response) => {
-          if (response.statusCode !== 200) {
+          if (this.verbose) {
+            console.log('response')
+            console.log(response)
+          }
+
+          if (response.statusCode >= 500) {
             return reject(new RempError('http-failure', response))
           }
 
           let data = ''
           response.on('data', (chunk) => {
-            data += chunk
-          })
+            data += chunk;
+          });
           response.on('end', () => {
             if (this.verbose) {
+              console.log('data')
               console.log(data)
             }
+
             const result = JSON.parse(data)
 
             // we check the result for an access token, if it is there, we store the token for potential later use
@@ -128,9 +145,16 @@ class Remp {
             return reject(new RempError('remp-failure', err))
           })
         })
-      if (body !== '') {
+
+      if ('POST' === method) {
         req.write(body)
       }
+
+      if (this.verbose) {
+        console.log('req')
+        console.log(req)
+      }
+
       req.end()
     })
   }
@@ -138,24 +162,24 @@ class Remp {
   isSuccess (result) { return result.status && result.status === 'ok' }
 
   /**
-     *
-     * @param {string} path the path to the endpoint
-     * @param {Array|string} params the parameters to send
-     * @param {Array} headers additional headers to send
-     * @returns {Promise<Object>} response result
-     */
-  async get (path, params = '', headers = []) {
+   *
+   * @param {string} path the path to the endpoint
+   * @param {Array|string} params the parameters to send
+   * @param {Array} headers additional headers to send
+   * @returns {Promise<Object>} response result
+   */
+  async get(path, params = '', headers = []) {
     return this.request('GET', path, params, headers)
   }
 
   /**
-     *
-     * @param {string} path the path to the endpoint
-     * @param {Array|string} params the parameters to send
-     * @param {Array} headers additional headers to send
-     * @returns {Promise<Object>} response result
-     */
-  async post (path, params = '', headers = []) {
+   *
+   * @param {string} path the path to the endpoint
+   * @param {Array|string} params the parameters to send
+   * @param {Array} headers additional headers to send
+   * @returns {Promise<Object>} response result
+   */
+  async post(path, params = '', headers = []) {
     return this.request('POST', path, params, headers)
   }
 
@@ -163,13 +187,15 @@ class Remp {
    * Checks if the last request contained an access token
    * @returns {boolean} true if the last request contained an access token
    */
-  hasNewToken () { return this.userToken != null }
+  hasNewToken() {
+    return this.userToken != null
+  }
 
   /**
    * Creates a new instance based on the current instance settings with the last responded access token
    * @returns {Remp} a new instance with the last responded access token
    */
-  createTokenInstance () {
+  createTokenInstance() {
     const options = {
       server: this.server,
       token: this.userToken,
@@ -187,10 +213,10 @@ class Remp {
  */
 class RempError extends Error {
   /**
-    * @param {string} message error message, 'http-failure' or 'remp-failure'
-    * @param {*} data error specific data
-    */
-  constructor (message, data) {
+   * @param {string} message error message, 'http-failure' or 'remp-failure'
+   * @param {*} data error specific data
+   */
+  constructor(message, data) {
     super(message)
     this.data = data
   }
@@ -198,7 +224,9 @@ class RempError extends Error {
   /**
    * @returns {*} error specific data
    */
-  getData () { return this.data }
+  getData() {
+    return this.data
+  }
 }
 
 const RempUser = require('./lib/User')
