@@ -71,7 +71,7 @@ class Remp {
 
     if (typeof params !== 'string') {
 
-      query += querystring.stringify(params)
+      query = querystring.stringify(params)
 
       // polyfill
       if (!String.prototype.startsWith) {
